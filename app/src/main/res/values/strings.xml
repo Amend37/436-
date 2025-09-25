@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Graduation RSVP</string>
+    <string name="graduation_announcement">Graduation\nAnnouncement</string>
+    <string name="event_details">May 14 • Ganus Hall • 2:00 pm</string>
+    <string name="ill_be_there">I’ll be there!</string>
+    <string name="cap_cd">Graduation cap</string>
+</resources>
