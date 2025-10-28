@@ -60,33 +60,40 @@ fun PetApp(
       navController = navController,
       startDestination = Routes.List
    ) {
+
       composable<Routes.List> {
          ListScreen(
             petList = petViewModel.petList,
             onImageClick = { pet ->
                petViewModel.selectedPet = pet
-               // Use toRoute() here
                navController.navigate(Routes.Detail)
             }
          )
       }
+
+
       composable<Routes.Detail> {
          DetailScreen(
             pet = petViewModel.selectedPet,
             onAdoptClick = {
-               // And use toRoute() here
                navController.navigate(Routes.Adopt)
+            },
+            onUpClick = {
+               navController.navigateUp()
             }
          )
       }
+
       composable<Routes.Adopt> {
          AdoptScreen(
             pet = petViewModel.selectedPet,
+            onUpClick = {
+               navController.navigateUp()
+            }
          )
       }
    }
 }
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -168,6 +175,8 @@ fun DetailScreen(
       topBar = {
          PetAppBar(
             title = "Details",
+            canNavigateBack = true,
+            onUpClick = onUpClick
          )
       }
    ) { innerPadding ->
@@ -235,6 +244,8 @@ fun AdoptScreen(
       topBar = {
          PetAppBar(
             title = "Thank You!",
+            canNavigateBack = true,
+            onUpClick = onUpClick
          )
       }
    ) { innerPadding ->
