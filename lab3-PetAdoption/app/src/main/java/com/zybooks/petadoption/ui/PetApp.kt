@@ -37,6 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
 import com.zybooks.petadoption.data.PetDataSource
 import com.zybooks.petadoption.data.PetGender
 import com.zybooks.petadoption.ui.theme.PetAdoptionTheme
@@ -45,38 +46,36 @@ import kotlinx.serialization.Serializable
 sealed class Routes {
    @Serializable
    data object List
+
    @Serializable
-   data object Detail
+   data class Detail(val petId: Int)
+
    @Serializable
-   data object Adopt
+   data class Adopt(val petId: Int)
 }
+
 @Composable
-fun PetApp(
-   petViewModel: PetViewModel = viewModel()
-) {
+fun PetApp() {
    val navController = rememberNavController()
 
    NavHost(
       navController = navController,
       startDestination = Routes.List
    ) {
-
       composable<Routes.List> {
          ListScreen(
-            petList = petViewModel.petList,
             onImageClick = { pet ->
-               petViewModel.selectedPet = pet
-               navController.navigate(Routes.Detail)
+               navController.navigate(Routes.Detail(pet.id))
             }
          )
       }
 
-
-      composable<Routes.Detail> {
+      composable<Routes.Detail> { backStackEntry ->
+         val details: Routes.Detail = backStackEntry.toRoute()
          DetailScreen(
-            pet = petViewModel.selectedPet,
+            petId = details.petId,
             onAdoptClick = {
-               navController.navigate(Routes.Adopt)
+               navController.navigate(Routes.Adopt(details.petId))
             },
             onUpClick = {
                navController.navigateUp()
@@ -84,9 +83,10 @@ fun PetApp(
          )
       }
 
-      composable<Routes.Adopt> {
+      composable<Routes.Adopt> { backStackEntry ->
+         val adopt: Routes.Adopt = backStackEntry.toRoute()
          AdoptScreen(
-            pet = petViewModel.selectedPet,
+            petId = adopt.petId,
             onUpClick = {
                navController.navigateUp()
             }
