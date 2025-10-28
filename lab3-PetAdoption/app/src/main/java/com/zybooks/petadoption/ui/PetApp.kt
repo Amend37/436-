@@ -120,15 +120,13 @@ fun PetAppBar(
 }
 @Composable
 fun ListScreen(
-   petList: List<Pet>,
    onImageClick: (Pet) -> Unit,
-   modifier: Modifier = Modifier
+   modifier: Modifier = Modifier,
+   viewModel: ListViewModel = viewModel()
 ) {
    Scaffold(
       topBar = {
-         PetAppBar(
-            title = "Find a Friend"
-         )
+         PetAppBar(title = "Find a Friend")
       }
    ) { innerPadding ->
       LazyVerticalGrid(
@@ -136,7 +134,7 @@ fun ListScreen(
          contentPadding = PaddingValues(0.dp),
          modifier = modifier.padding(innerPadding)
       ) {
-         items(petList) { pet ->
+         items(viewModel.petList) { pet ->
             Image(
                painter = painterResource(id = pet.imageId),
                contentDescription = "${pet.type} ${pet.gender}",
@@ -150,26 +148,25 @@ fun ListScreen(
    }
 }
 
+
 @Preview
 @Composable
 fun PreviewListScreen() {
    PetAdoptionTheme {
-      ListScreen(
-         petList = PetDataSource().loadPets(),
-         onImageClick = { }
-      )
+      ListScreen(onImageClick = { })
    }
 }
 
 @Composable
 fun DetailScreen(
-   pet: Pet,
+   petId: Int,
    onAdoptClick: () -> Unit,
    modifier: Modifier = Modifier,
+   viewModel: DetailViewModel = viewModel(),
    onUpClick: () -> Unit = { }
 ) {
+   val pet = viewModel.getPet(petId)
    val gender = if (pet.gender == PetGender.MALE) "Male" else "Female"
-
 
    Scaffold(
       topBar = {
@@ -180,48 +177,31 @@ fun DetailScreen(
          )
       }
    ) { innerPadding ->
-      Column(
-
-         modifier = modifier.padding(innerPadding)
-      ) {
+      Column(modifier = modifier.padding(innerPadding)) {
          Image(
             painter = painterResource(pet.imageId),
             contentDescription = pet.name,
             contentScale = ContentScale.FillWidth
          )
-         Column(
-            verticalArrangement = Arrangement.spacedBy(6.dp),
-            modifier = modifier.padding(6.dp)
-         ) {
+         Column(verticalArrangement = Arrangement.spacedBy(6.dp), modifier = modifier.padding(6.dp)) {
             Row(
                horizontalArrangement = Arrangement.SpaceBetween,
                verticalAlignment = Alignment.CenterVertically,
                modifier = modifier.fillMaxWidth()
             ) {
-               Text(
-                  text = pet.name,
-                  style = MaterialTheme.typography.headlineMedium
-               )
+               Text(text = pet.name, style = MaterialTheme.typography.headlineMedium)
                Button(onClick = onAdoptClick) {
                   Text("Adopt Me!")
                }
             }
-            Text(
-               text = "Gender: $gender",
-               style = MaterialTheme.typography.bodyLarge
-            )
-            Text(
-               text = "Age: ${pet.age}",
-               style = MaterialTheme.typography.bodyLarge
-            )
-            Text(
-               text = pet.description,
-               style = MaterialTheme.typography.bodyMedium
-            )
+            Text("Gender: $gender", style = MaterialTheme.typography.bodyLarge)
+            Text("Age: ${pet.age}", style = MaterialTheme.typography.bodyLarge)
+            Text(pet.description, style = MaterialTheme.typography.bodyMedium)
          }
       }
    }
 }
+
 
 @Preview
 @Composable
@@ -229,17 +209,20 @@ fun PreviewDetailScreen() {
    val pet = PetDataSource().loadPets()[0]
    PetAdoptionTheme {
       DetailScreen(
-         pet = pet,
+         petId = pet.id,
          onAdoptClick = { }
       )
    }
 }
 @Composable
 fun AdoptScreen(
-   pet: Pet,
+   petId: Int,
    modifier: Modifier = Modifier,
+   viewModel: AdoptViewModel = viewModel(),
    onUpClick: () -> Unit = { }
 ) {
+   val pet = viewModel.getPet(petId)
+
    Scaffold(
       topBar = {
          PetAppBar(
@@ -249,9 +232,7 @@ fun AdoptScreen(
          )
       }
    ) { innerPadding ->
-      Column(
-         modifier = modifier.padding(innerPadding)
-      ) {
+      Column(modifier = modifier.padding(innerPadding)) {
          Row(verticalAlignment = Alignment.CenterVertically) {
             Image(
                painter = painterResource(pet.imageId),
@@ -269,10 +250,7 @@ fun AdoptScreen(
             text = "Please pick up your new family member during business hours.",
             modifier = modifier.padding(6.dp),
          )
-         Button(
-            onClick = { },
-            modifier = modifier.padding(6.dp)
-         ) {
+         Button(onClick = { }, modifier = modifier.padding(6.dp)) {
             Icon(Icons.Default.Share, null)
             Text("Share", modifier = modifier.padding(start = 8.dp))
          }
@@ -280,11 +258,12 @@ fun AdoptScreen(
    }
 }
 
+
 @Preview
 @Composable
 fun PreviewAdoptScreen() {
    val pet = PetDataSource().loadPets()[0]
    PetAdoptionTheme {
-      AdoptScreen(pet)
+      AdoptScreen(pet.id)
    }
 }
