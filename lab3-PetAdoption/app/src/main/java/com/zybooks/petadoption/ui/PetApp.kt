@@ -24,9 +24,11 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.zybooks.petadoption.data.Pet
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
@@ -63,6 +65,7 @@ fun PetApp(
             petList = petViewModel.petList,
             onImageClick = { pet ->
                petViewModel.selectedPet = pet
+               // Use toRoute() here
                navController.navigate(Routes.Detail)
             }
          )
@@ -71,6 +74,7 @@ fun PetApp(
          DetailScreen(
             pet = petViewModel.selectedPet,
             onAdoptClick = {
+               // And use toRoute() here
                navController.navigate(Routes.Adopt)
             }
          )
@@ -88,17 +92,25 @@ fun PetApp(
 @Composable
 fun PetAppBar(
    title: String,
-   modifier: Modifier = Modifier
+   modifier: Modifier = Modifier,
+   canNavigateBack: Boolean = false,
+   onUpClick: () -> Unit = { },
 ) {
    TopAppBar(
       title = { Text(title) },
       colors = TopAppBarDefaults.topAppBarColors(
          containerColor = MaterialTheme.colorScheme.primaryContainer
       ),
-      modifier = modifier
+      modifier = modifier,
+      navigationIcon = {
+         if (canNavigateBack) {
+            IconButton(onClick = onUpClick) {
+               Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back")
+            }
+         }
+      }
    )
 }
-
 @Composable
 fun ListScreen(
    petList: List<Pet>,
@@ -265,4 +277,3 @@ fun PreviewAdoptScreen() {
       AdoptScreen(pet)
    }
 }
-
